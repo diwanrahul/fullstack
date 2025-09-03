@@ -20,21 +20,23 @@ exports.compressImage = async (req, res) => {
       .jpeg({ quality: parseInt(quality) })
       .toBuffer();
 
-    const uploadsDir = path.join(__dirname, "../uploads");
-
-    // Ensure uploads folder exists
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-
     const ext = req.file.mimetype.split("/")[1];
     const baseName = path.parse(req.file.originalname).name; // only name, no ext
 
     const filename = `compressed-${Date.now()}-${baseName}-quality-${quality}.${ext}`;
 
-    const localPath = path.join(uploadsDir, filename);
+    // ✅ Only save locally in development (not on Vercel)
+    let localPath = null;
+    if (process.env.NODE_ENV === "development") {
+      const uploadsDir = path.join(__dirname, "../uploads");
 
-    fs.writeFileSync(localPath, compressedBuffer);
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      localPath = path.join(uploadsDir, filename);
+      fs.writeFileSync(localPath, compressedBuffer);
+    }
 
     // Normalize path for URL
     const publicPath = `/uploads/${filename}`.replace(/\\/g, "/");
