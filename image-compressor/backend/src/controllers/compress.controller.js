@@ -20,12 +20,20 @@ exports.compressImage = async (req, res) => {
       .jpeg({ quality: parseInt(quality) })
       .toBuffer();
 
-    const filename = `compressed-${Date.now()}-${
-      req.file.originalname
-    }-quality-${quality}.${req.file.mimetype.split("/")[1]}`;
-    const localPath = path.join("uploads", filename);
+    const uploadsDir = path.join(__dirname, "../uploads");
 
-    // Write file
+    // Ensure uploads folder exists
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const ext = req.file.mimetype.split("/")[1];
+    const baseName = path.parse(req.file.originalname).name; // only name, no ext
+
+    const filename = `compressed-${Date.now()}-${baseName}-quality-${quality}.${ext}`;
+
+    const localPath = path.join(uploadsDir, filename);
+
     fs.writeFileSync(localPath, compressedBuffer);
 
     // Normalize path for URL
@@ -50,7 +58,7 @@ exports.compressImage = async (req, res) => {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: fileKey,
       Body: compressedBuffer,
-      ContentType: "image/*",
+      ContentType: req.file.mimetype,
     });
 
     await s3.send(uploadParams);
