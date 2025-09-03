@@ -1,0 +1,27 @@
+# Node modules
+backend/node_modules/
+frontend/node_modules/
+backend/uploads
+
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+backend/.env
+frontend/.env
+
+# Build output
+dist/
+build/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
