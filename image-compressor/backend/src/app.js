@@ -22,7 +22,14 @@ app.use(
 );
 app.use(helmet());
 app.use(cookieParser());
-app.use(cors({ credentials: true, origin: "*" }));
+// app.use(cors({ credentials: true, origin: "*" }));
+app.use(
+  cors({
+    origin: "https://kilobytekutter.vercel.app", // your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true, // if using cookies/auth
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
